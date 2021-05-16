@@ -4,12 +4,13 @@ require("dotenv").config({ silent: true });
 
 const settings = {
     currentEnv: process.env.NODE_ENV || "development",
-    port: process.env.PORT || 7000,
+    port: process.env.PORT || 8000,
     db: {
-        port: process.env.DB_PORT || 27017,
+        port: process.env.DB_PORT || 3306,
         hostname: process.env.DB_HOSTNAME || "",
         username: process.env.DB_USERNAME || "",
         password: process.env.DB_PASSWORD || "",
+        name: process.env.DB_NAME || ""
     },
 }
 

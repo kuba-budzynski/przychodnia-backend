@@ -27,16 +27,16 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"properties": {
-										"data": {
-											"items": {},
-											"type": "array"
-										}
+									"items": {
+										"properties": {
+											"email": {}
+										},
+										"required": [
+											"email"
+										],
+										"type": "object"
 									},
-									"required": [
-										"data"
-									],
-									"type": "object"
+									"type": "array"
 								}
 							}
 						}
