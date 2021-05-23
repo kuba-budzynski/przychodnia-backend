@@ -1,26 +1,35 @@
-import {Controller, Get, Path, Route} from "tsoa";
+import express from "express";
+import {Controller, Get, Path, Post, Request, Route} from "tsoa";
 import knex from '../config/database'
 
 @Route("user")
 export class UserProfileController extends Controller {
-    @Get("/profile/{id}")
-    public async getProfile(@Path() id: string) {
-        const x = await  knex('users').select({
-            id: 'users.id',
-            name: 'users.name',
-            surname: 'users.surname',
-            email: 'users.email',
-            birthday: 'users.birthday',
-            phone: 'users.phone',
-            pesel: 'user.pesel'
-        }).where('id', id).limit(1)
-
-        if(x.length == 0){
-
-            const res = await knex('users_login').select({email: 'users_login.email'}).where('id', id).limit(1)
-            const res2 = await knex('users').insert({email: res[0].email, id: id })
-            return await knex('users').select().where('id', id)
+    @Get("/profile/{email}")
+    public async getProfile(@Path() email: string) {
+        const user = await  knex('users').select({id: 'users.email'}).where('email', email)
+        if(user.length <= 0){
+            await knex('users').insert({email: email, fresh: true})
         }
-        return x
+        const x = await  knex('users').where('email', email)
+        return x[0]
+    }
+
+    @Post('/profile/{email}')
+    public async updateProfile(@Path() email: string, @Request() request: express.Request){
+        console.log("This is a request for: " + email)
+        console.log(JSON.stringify(request.body))
+        const toUpdate = {
+            name: request.body.name,
+            name_updated: request.body.name != "",
+            surname: request.body.surname,
+            surname_updated: request.body.surname != "",
+            birthday: request.body.birthday ? new Date(request.body.birthday) : null,
+            birthday_updated: request.body.birthday != null,
+            pesel: request.body.pesel,
+            phone_updated: request.body.phone != "",
+            phone: request.body.phone ? request.body.phone.parseInt() : 0
+        }
+        console.log(toUpdate)
+        return knex('users').where('email', email).update(toUpdate).then(() => true).catch((err) => false)
     }
 }
