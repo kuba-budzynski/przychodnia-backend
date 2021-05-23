@@ -18,7 +18,7 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
-		"/basic/{num}": {
+		"/user/emails": {
 			"get": {
 				"operationId": "GetBasic",
 				"responses": {
@@ -43,14 +43,69 @@
 					}
 				},
 				"security": [],
+				"parameters": []
+			}
+		},
+		"/user/exists/{id}": {
+			"get": {
+				"operationId": "UserExists",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"exists": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"exists"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
 				"parameters": [
 					{
 						"in": "path",
-						"name": "num",
+						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user/profile/{id}": {
+			"get": {
+				"operationId": "GetProfile",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
 						}
 					}
 				]

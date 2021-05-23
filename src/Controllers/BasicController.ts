@@ -1,10 +1,10 @@
 import {Controller, Get, Path, Route} from "tsoa";
 import knex from '../config/database'
 
-@Route("basic")
+@Route("user")
 export class BasicController extends Controller {
-    @Get("/{num}")
-    public async getBasic(@Path() num: number) {
+    @Get("/emails")
+    public async getBasic() {
         const x = knex('users').select({email: 'users.email'})
         return x
     }
