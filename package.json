@@ -8,7 +8,7 @@
     "test": "npm run build && ava",
     "nodemon": "nodemon",
     "build": "rimraf ./build && tsoa spec-and-routes && tsc",
-    "start": "npm run build && node build/index.js",
+    "start": "npm run build && node build/src/index.js",
     "knex": "knex"
   },
   "repository": {
