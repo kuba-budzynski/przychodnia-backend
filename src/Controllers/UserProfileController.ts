@@ -26,8 +26,8 @@ export class UserProfileController extends Controller {
             birthday: request.body.birthday ? new Date(request.body.birthday) : null,
             birthday_updated: request.body.birthday != null,
             pesel: request.body.pesel,
-            phone_updated: request.body.phone != "",
-            phone: request.body.phone ? request.body.phone.parseInt() : 0
+            pesel_updated: request.body.pesel != "",
+            phone: request.body.phone
         }
         console.log(toUpdate)
         return knex('users').where('email', email).update(toUpdate).then(() => true).catch((err) => false)
