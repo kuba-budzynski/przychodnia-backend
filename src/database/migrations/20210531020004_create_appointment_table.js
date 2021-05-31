@@ -3,7 +3,7 @@ exports.up = function(knex) {
     return knex.schema.createTable('appointment', (table) => {
         table.increments('id').primary()
         table.string('patient').references('email').inTable('users');
-        table.integer('details').references('id').inTable('appointment_details');
+        table.integer('details').unsigned().notNullable().references('id').inTable('appointment_details');
         table.string('doctorKey').notNull()
         table.date('date').notNull()
         table.boolean('isDone').defaultTo(false)
