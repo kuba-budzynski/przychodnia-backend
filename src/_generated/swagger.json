@@ -18,6 +18,32 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
+		"/appointment/{id}": {
+			"get": {
+				"operationId": "GetAppointment",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/user/emails": {
 			"get": {
 				"operationId": "GetBasic",
