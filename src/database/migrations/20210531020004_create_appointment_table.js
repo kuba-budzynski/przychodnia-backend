@@ -5,7 +5,7 @@ exports.up = function(knex) {
         table.string('patient').references('email').inTable('users');
         table.integer('details').unsigned().notNullable().references('id').inTable('appointment_details');
         table.string('doctorKey').notNull()
-        table.date('date').notNull()
+        table.timestamp('date').notNull()
         table.boolean('isDone').defaultTo(false)
     })
 };

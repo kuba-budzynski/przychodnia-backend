@@ -1,7 +1,7 @@
 exports.up = function(knex) {
     return knex.schema.createTable('appointment_details', (table) => {
         table.increments('id').primary()
-        table.date('date').notNull()
+        table.timestamp('date').notNull()
         table.integer('duration').notNull()
         table.float('price').notNull()
         table.string('notes')

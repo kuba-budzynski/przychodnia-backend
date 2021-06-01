@@ -74,7 +74,7 @@ export class AppointmentController extends Controller {
         console.log('This is a request for: ' + email);
         console.log(JSON.stringify(request.body));
         const newDetails = {
-            date:  request.body.date, 
+            date:  new Date(request.body.date), 
             duration:  request.body.duration, 
             price:  request.body.price, 
             notes:  request.body.notes, 
@@ -87,11 +87,14 @@ export class AppointmentController extends Controller {
             patient: email, 
             details: detail_id, 
             doctorKey: request.body.doctorKey, 
-            date: request.body.date,
+            date:  new Date(request.body.date),
         };
 
         return await knex('appointment').insert(newAppointment, ['id']).then(() => true)
-        .catch((err) => false);;
+        .catch((err) => {
+            console.log(err)
+            return false
+        });
     }
 
     @Post('/setAsDone/{id}')
