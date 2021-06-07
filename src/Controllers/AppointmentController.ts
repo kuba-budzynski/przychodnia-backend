@@ -1,5 +1,5 @@
 import express from 'express';
-import { Controller, Get, Path, Route, Request, Post } from 'tsoa';
+import { Controller, Get, Path, Route, Request, Post, Delete } from 'tsoa';
 import knex from '../config/database';
 
 @Route('appointment')
@@ -102,5 +102,13 @@ export class AppointmentController extends Controller {
             .update({...x, isDone: true})
             .then(() => true)
             .catch((err) => false);
+    }
+    @Delete('/{id}')
+    public async deleteAppointment(@Path() id: number){
+        const x = await knex('appointment').where('id', id);
+        const details = await knex('appointment_details').where('id', x[0].details).del();
+        return await knex('appointment').where('id', id).del()
+        .then(() => true)
+        .catch((err) => false);
     }
 }
