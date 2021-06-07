@@ -12,6 +12,27 @@ export class AppointmentController extends Controller {
         return {...x, details: details};
     }
 
+    @Get('/')
+    public async getAllAppointment() {
+        const x = await knex('appointment');
+        const withDetails = x.map( async e => {
+            const details = await knex('appointment_details').where('id', e.details);
+            return {...e, details: details};
+        })
+        return  Promise.all(withDetails).then(res => res);
+    }
+
+    @Get('/all/{fromDate}/{toDate}')
+    public async getAllAppointmentsInGivenRange(@Path() fromDate: string, @Path() toDate: string) {
+        const x = await knex('appointment').where('date', '>=', fromDate)
+        .where('date', '<', toDate);
+        const withDetails = x.map( async e => {
+            const details = await knex('appointment_details').where('id', e.details);
+            return {...e, details: details};
+        })
+        return  Promise.all(withDetails).then(res => res);
+    }
+
     @Get('/all/{email}')
     public async getAllUserAppointments(@Path() email: string) {
         const x = await knex('appointment').where('patient', email);
