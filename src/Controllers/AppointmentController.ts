@@ -90,8 +90,8 @@ export class AppointmentController extends Controller {
             date: request.body.date,
         };
 
-        const appointment_id = await knex('appointment').insert(newAppointment, ['id']);
-        console.log({...newAppointment, id: appointment_id, details: newDetails});
+        return await knex('appointment').insert(newAppointment, ['id']).then(() => true)
+        .catch((err) => false);;
     }
 
     @Post('/setAsDone/{id}')
