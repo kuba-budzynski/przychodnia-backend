@@ -109,7 +109,8 @@ export class AppointmentController extends Controller {
     @Delete('/{id}')
     public async deleteAppointment(@Path() id: number){
         const x = await knex('appointment').where('id', id);
-        const details = await knex('appointment_details').where('id', x[0].details).del();
+        const y = await knex('appointment_details').where('id', x[0].details);
+        await knex('appointment').where('id', y[0].id).del()
         return await knex('appointment').where('id', id).del()
         .then(() => true)
         .catch((err) => false);
