@@ -101,6 +101,33 @@
 				"parameters": []
 			}
 		},
+		"/appointment/slots/{months}": {
+			"get": {
+				"operationId": "GetAllSlots",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "months",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
 		"/appointment/all/{fromDate}/{toDate}": {
 			"get": {
 				"operationId": "GetAllAppointmentsInGivenRange",

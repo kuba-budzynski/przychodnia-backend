@@ -1,6 +1,11 @@
 import express from 'express';
 import { Controller, Get, Path, Route, Request, Post, Delete } from 'tsoa';
 import knex from '../config/database';
+import { getDocors, getSlots } from '../slots';
+import algoliasearch  from 'algoliasearch';
+
+const client = algoliasearch(process.env.ALGOLIA_APP_ID, process.env.ALGOLIA_KEY);
+const index = client.initIndex("prod_SLOTS");
 
 @Route('appointment')
 export class AppointmentController extends Controller {
@@ -20,6 +25,19 @@ export class AppointmentController extends Controller {
             return {...e, details: details};
         })
         return  Promise.all(withDetails).then(res => res);
+    }
+
+    @Get('/slots/{months}')
+    public async getAllSlots(@Path() months: number) {
+        const today = new Date()
+        const slots =await getSlots(today, new Date(today.getFullYear(), today.getMonth() + 3, today.getDate(),0,0));
+        console.log(slots)
+        const err = index.replaceAllObjects(slots, { autoGenerateObjectIDIfNotExist: true })
+        .then(({ objectIDs }) => console.log(objectIDs)).catch(err => err);
+        if(err) {
+            return err;
+        }
+        return slots;
     }
 
     @Get('/all/{fromDate}/{toDate}')
@@ -73,6 +91,7 @@ export class AppointmentController extends Controller {
     public async createAppointment(@Path() email: string, @Request() request: express.Request) {
         console.log('This is a request for: ' + email);
         console.log(JSON.stringify(request.body));
+        index.deleteObjects(request.body.objectID);
         const newDetails = {
             date:  new Date(request.body.date), 
             duration:  request.body.duration, 
@@ -90,7 +109,13 @@ export class AppointmentController extends Controller {
             date:  new Date(request.body.date),
         };
 
-        return await knex('appointment').insert(newAppointment, ['id']).then(() => true)
+        return await knex('appointment').insert(newAppointment, ['id']).then(async () => {
+            const today = new Date()
+            index.replaceAllObjects(
+                await getSlots(today, new Date(today.getFullYear(), today.getMonth() + 3, 0)), { autoGenerateObjectIDIfNotExist: true }).then(({ objectIDs }) => objectIDs);
+       
+            return true;
+        })
         .catch((err) => {
             console.log(err)
             return false
@@ -112,7 +137,12 @@ export class AppointmentController extends Controller {
         const y = await knex('appointment_details').where('id', x[0].details);
         await knex('appointment').where('id', id).del()
         await knex('appointment_details').where('id', y[0].id).del()
-        .then(() => true)
+        .then(() => {
+            async () => {
+            const today = new Date()
+       
+            return true;
+        }})
         .catch((err) => false);
     }
 }
