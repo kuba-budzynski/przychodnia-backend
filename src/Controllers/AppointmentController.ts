@@ -107,16 +107,16 @@ export class AppointmentController extends Controller {
             date:  new Date(request.body.date),
         };
         const objectsID = []
-        console.log(`doctorKey: "ckp0a1x2of5860c08gxa8b0o1" AND date >= ${request.body.date} AND date < ${request.body.date + 900000}`);
-        index.browseObjects({
-            query: '', 
-            filters: `doctorKey: ckp0a1x2of5860c08gxa8b0o1`,
+        console.log(`doctorKey: "ckp0a1x2of5860c08gxa8b0o1" AND date >= ${request.body.date} AND date < ${request.body.date + request.body.duration*900000}`);
+        await index.browseObjects({
+            query: '',
+            filters: `doctorKey: ${newAppointment.doctorKey} AND date >= ${request.body.date} AND date < ${request.body.date + request.body.duration*900000}`,
             batch: batch => {
-                objectsID.push(batch);
+                objectsID.push(batch)
             }
-          }).catch(e => console.log(e))
+          });
         return await knex('appointment').insert(newAppointment, ['id']).then(async () => {
-            index.deleteObjects(objectsID.map(e => e.objectsID));
+            await index.deleteObjects(objectsID[0].map(e => e.objectID));
             return true;
         })
         .catch((err) => {
