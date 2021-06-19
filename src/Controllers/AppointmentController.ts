@@ -31,7 +31,6 @@ export class AppointmentController extends Controller {
     public async getAllSlots(@Path() months: number) {
         const today = new Date()
         const slots =await getSlots(today, new Date(today.getFullYear(), today.getMonth() + 3, today.getDate(),0,0));
-        console.log(slots)
         const err = index.replaceAllObjects(slots, { autoGenerateObjectIDIfNotExist: true })
         .then(({ objectIDs }) => console.log(objectIDs)).catch(err => err);
         if(err) {
@@ -91,7 +90,6 @@ export class AppointmentController extends Controller {
     public async createAppointment(@Path() email: string, @Request() request: express.Request) {
         console.log('This is a request for: ' + email);
         console.log(JSON.stringify(request.body));
-        index.deleteObjects(request.body.objectID);
         const newDetails = {
             date:  new Date(request.body.date), 
             duration:  request.body.duration, 
@@ -104,16 +102,21 @@ export class AppointmentController extends Controller {
         const detail_id = await knex('appointment_details').insert(newDetails, ['id']);
         const newAppointment = {
             patient: email, 
-            details: detail_id, 
+            details: detail_id[0], 
             doctorKey: request.body.doctorKey, 
             date:  new Date(request.body.date),
         };
-
+        const objectsID = []
+        console.log(`doctorKey: "ckp0a1x2of5860c08gxa8b0o1" AND date >= ${request.body.date} AND date < ${request.body.date + 900000}`);
+        index.browseObjects({
+            query: '', 
+            filters: `doctorKey: ckp0a1x2of5860c08gxa8b0o1`,
+            batch: batch => {
+                objectsID.push(batch);
+            }
+          }).catch(e => console.log(e))
         return await knex('appointment').insert(newAppointment, ['id']).then(async () => {
-            const today = new Date()
-            index.replaceAllObjects(
-                await getSlots(today, new Date(today.getFullYear(), today.getMonth() + 3, 0)), { autoGenerateObjectIDIfNotExist: true }).then(({ objectIDs }) => objectIDs);
-       
+            index.deleteObjects(objectsID.map(e => e.objectsID));
             return true;
         })
         .catch((err) => {
