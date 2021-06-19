@@ -3,6 +3,8 @@ import { request, gql, GraphQLClient } from 'graphql-request'
 import { Controller, Get, Path, Route, Request, Post, Delete } from 'tsoa';
 import knex from './config/database';
 import e from 'express';
+
+const DAY_TO_MILIS = 86400000
 function generateTimes() {
     let quarterHours = ['00', '15', '30', '45'];
     let times = [];
@@ -142,7 +144,7 @@ export async function getSlots(fromDate, toDate) {
                 })
             )
         );
-        iter = iter + 86400000;
+        iter = iter + DAY_TO_MILIS;
     }
     
     //console.log(flatten(appointments))

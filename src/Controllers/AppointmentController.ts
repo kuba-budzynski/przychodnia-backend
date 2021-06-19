@@ -4,6 +4,8 @@ import knex from '../config/database';
 import { getDocors, getSlots } from '../slots';
 import algoliasearch  from 'algoliasearch';
 
+const MINUTES_TO_MILIS = 60000
+
 const client = algoliasearch(process.env.ALGOLIA_APP_ID, process.env.ALGOLIA_KEY);
 const index = client.initIndex("prod_SLOTS");
 
@@ -107,10 +109,9 @@ export class AppointmentController extends Controller {
             date:  new Date(request.body.date),
         };
         const objectsID = []
-        console.log(`doctorKey: "ckp0a1x2of5860c08gxa8b0o1" AND date >= ${request.body.date} AND date < ${request.body.date + request.body.duration*900000}`);
         await index.browseObjects({
             query: '',
-            filters: `doctorKey: ${newAppointment.doctorKey} AND date >= ${request.body.date} AND date < ${request.body.date + request.body.duration*900000}`,
+            filters: `doctorKey: ${newAppointment.doctorKey} AND date >= ${request.body.date} AND date < ${request.body.date + request.body.duration*MINUTES_TO_MILIS}`,
             batch: batch => {
                 objectsID.push(batch)
             }
