@@ -5,6 +5,7 @@ import knex from './config/database';
 import e from 'express';
 
 const DAY_TO_MILIS = 86400000
+const MINUTES_TO_MILIS = 60000
 function generateTimes() {
     let quarterHours = ['00', '15', '30', '45'];
     let times = [];
@@ -54,11 +55,12 @@ export function getDocors() {
 }
 
 export async function generateSlotsFromAppointment(appointment) {
+    console.log('generateSlotsFromAppointment')
     const duration = appointment.duration;
-    const fromDate = appointment.deta;
+    const fromDate = appointment.date;
     let iter = fromDate.getTime();
     const doctors = await getDocors();
-    const d = doctors.find(element => element.id === appointment.doctorKey);
+    const d = doctors.doctors.find(element => element.id === appointment.doctorKey);
     const appointments = []
     while (iter < fromDate.getTime() + duration) {
         appointments.push(d.uslugiLekarzy.map((service) => {
@@ -74,7 +76,7 @@ export async function generateSlotsFromAppointment(appointment) {
                 doctorName: d.title +" "+d.name+" "+d.surname,
             };
         }))
-        iter = iter + 900;
+        iter = iter + MINUTES_TO_MILIS*15;
     }
     return appointments;
 }

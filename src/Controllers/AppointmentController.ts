@@ -1,7 +1,7 @@
 import express from 'express';
 import { Controller, Get, Path, Route, Request, Post, Delete } from 'tsoa';
 import knex from '../config/database';
-import { getDocors, getSlots } from '../slots';
+import { getDocors, getSlots, generateSlotsFromAppointment } from '../slots';
 import algoliasearch  from 'algoliasearch';
 
 const MINUTES_TO_MILIS = 60000
@@ -141,12 +141,11 @@ export class AppointmentController extends Controller {
         const y = await knex('appointment_details').where('id', x[0].details);
         await knex('appointment').where('id', id).del()
         await knex('appointment_details').where('id', y[0].id).del()
-        .then(() => {
-            async () => {
-            const today = new Date()
-       
+        .then(async () => {
+            const slots = await generateSlotsFromAppointment({...y, ...x})
+            await index.saveObjects(slots, { autoGenerateObjectIDIfNotExist: true })
             return true;
-        }})
+        })
         .catch((err) => false);
     }
 }
