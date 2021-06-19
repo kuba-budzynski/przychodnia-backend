@@ -34,6 +34,6 @@ export class UserProfileController extends Controller {
             .where('email', email)
             .update(toUpdate)
             .then(() => true)
-            .catch((err) => false);
+            .catch(() => false);
     }
 }

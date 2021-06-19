@@ -1,10 +1,14 @@
-FROM node:14
-WORKDIR /usr/src/app
+FROM node:alpine
 
-COPY package*.json ./
+RUN mkdir -p /usr/src
+
+WORKDIR /usr/src
+
+COPY . /usr/src
+
 RUN npm install 
 
-COPY . .
+RUN npm run build
 
 EXPOSE 8000
 
