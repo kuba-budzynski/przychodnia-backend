@@ -5,6 +5,10 @@ import knex from './config/database';
 import e from 'express';
 import { Console } from 'console';
 import { date } from 'joi';
+import algoliasearch  from 'algoliasearch';
+
+const clientAgolia = algoliasearch(process.env.ALGOLIA_APP_ID, process.env.ALGOLIA_KEY);
+export const index = clientAgolia.initIndex("prod_SLOTS");
 
 const DAY_TO_MILIS = 86400000
 const MINUTES_TO_MILIS = 60000
@@ -153,4 +157,29 @@ export async function getSlots(fromDate, toDate) {
     }
     
     return flatten(appointments);
+}
+
+export const deleteSlotsInActive = async () => {
+    console.log('deleteSlotsInActive')
+    const objectsID = []
+    await index.browseObjects({
+        query: '',
+        filters: `date < ${new Date().getTime()}`,
+        batch: batch => {
+            objectsID.push(batch)
+        }
+      });
+      await index.deleteObjects(objectsID[0].map(e => e.objectID));
+}
+
+export const exportSots = async () => {
+    console.log('export data')
+    const today = new Date()
+       const slots =await getSlots(today, new Date(today.getFullYear(), today.getMonth() + 3, today.getDate(),0,0));
+       const err = index.replaceAllObjects(slots, { autoGenerateObjectIDIfNotExist: true })
+        .then(({ objectIDs }) => console.log(objectIDs)).catch(err => err);
+        if(err) {
+            return err;
+        }
+        return slots;
 }

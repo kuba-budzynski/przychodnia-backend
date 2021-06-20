@@ -1,13 +1,9 @@
 import express from 'express';
 import { Controller, Get, Path, Route, Request, Post, Delete } from 'tsoa';
 import knex from '../config/database';
-import { getDocors, getSlots, generateSlotsFromAppointment } from '../slots';
-import algoliasearch  from 'algoliasearch';
+import { getDocors, getSlots, generateSlotsFromAppointment, index } from '../slots';
 
 const MINUTES_TO_MILIS = 60000
-
-const client = algoliasearch(process.env.ALGOLIA_APP_ID, process.env.ALGOLIA_KEY);
-const index = client.initIndex("prod_SLOTS");
 
 @Route('appointment')
 export class AppointmentController extends Controller {
