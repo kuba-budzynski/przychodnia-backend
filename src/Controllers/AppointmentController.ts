@@ -33,7 +33,7 @@ export class AppointmentController extends Controller {
     public async getAllSlots(@Path() months: number) {
         const today = new Date()
         const slots =await getSlots(today, new Date(today.getFullYear(), today.getMonth() + 3, today.getDate(),0,0));
-        const err = index.replaceAllObjects(slots, { autoGenerateObjectIDIfNotExist: true })
+       const err = index.replaceAllObjects(slots, { autoGenerateObjectIDIfNotExist: true })
         .then(({ objectIDs }) => console.log(objectIDs)).catch(err => err);
         if(err) {
             return err;

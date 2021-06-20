@@ -58,8 +58,8 @@ export function getDocors() {
 
 export async function generateSlotsFromAppointment(appointment) {
     const duration = appointment.duration;
-    const fromDate = appointment.date;
-    console.log(fromDate)
+    const fromDate = new Date(appointment.date);
+    fromDate.setHours(fromDate.getHours() + 2)
     let iter = fromDate.getTime();
     const doctors = await getDocors();
     const d = doctors.doctors.find(element => element.id === appointment.doctorKey);
@@ -95,12 +95,13 @@ export async function getSlots(fromDate, toDate) {
     const appointments = [];
     let iter = fromDate.getTime();
     while (iter <= toDate.getTime()) {
-        const day = new Date(iter) 
+        const day = new Date()
+        day.setTime(iter);
         appointments.push(
             flatten(
                 doctors.doctors.map((d) => {
                     const doctorsPlannedVisits = filter(plannedAppointments, (a) => {
-                        return a.doctorKey === d.id && new Date(a.date).getDate() === iter && new Date(a.date).getMonth() === fromDate.getMonth();
+                        return a.doctorKey === d.id && new Date(a.date).getDate() === day.getDate() && new Date(a.date).getMonth() === day.getMonth();
                     });
                     const availableHours = filter(times, (hour) => {
                         const hourAsDate = new Date(
@@ -151,6 +152,5 @@ export async function getSlots(fromDate, toDate) {
         iter = iter + DAY_TO_MILIS;
     }
     
-    //console.log(flatten(appointments))
     return flatten(appointments);
 }
