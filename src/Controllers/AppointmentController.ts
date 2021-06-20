@@ -92,21 +92,22 @@ export class AppointmentController extends Controller {
     public async createAppointment(@Path() email: string, @Request() request: express.Request) {
         console.log('This is a request for: ' + email);
         console.log(JSON.stringify(request.body));
+        const appointmentDate = new Date()
+        appointmentDate.setTime(request.body.date);
         const newDetails = {
-            date:  new Date(request.body.date), 
+            date:  appointmentDate,
             duration:  request.body.duration, 
             price:  request.body.price, 
             notes:  request.body.notes, 
             typeKey:  request.body.typeKey, 
             serviceKey:  request.body.serviceKey
         };
-        
         const detail_id = await knex('appointment_details').insert(newDetails, ['id']);
         const newAppointment = {
             patient: email, 
             details: detail_id[0], 
             doctorKey: request.body.doctorKey, 
-            date:  new Date(request.body.date),
+            date:  appointmentDate,
         };
         const objectsID = []
         await index.browseObjects({
@@ -136,16 +137,14 @@ export class AppointmentController extends Controller {
             .catch((err) => false);
     }
     @Delete('/{id}')
-    public async deleteAppointment(@Path() id: number){
+    public async deleteAppointment(@Path() id: number) {
         const x = await knex('appointment').where('id', id);
         const y = await knex('appointment_details').where('id', x[0].details);
+        const slots = await generateSlotsFromAppointment({...y[0], ...x[0]})
+        await index.saveObjects(slots, { autoGenerateObjectIDIfNotExist: true });
         await knex('appointment').where('id', id).del()
         await knex('appointment_details').where('id', y[0].id).del()
-        .then(async () => {
-            const slots = await generateSlotsFromAppointment({...y, ...x})
-            await index.saveObjects(slots, { autoGenerateObjectIDIfNotExist: true })
-            return true;
-        })
+        .then(() => true)
         .catch((err) => false);
     }
 }

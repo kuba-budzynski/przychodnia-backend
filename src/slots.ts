@@ -3,6 +3,8 @@ import { request, gql, GraphQLClient } from 'graphql-request'
 import { Controller, Get, Path, Route, Request, Post, Delete } from 'tsoa';
 import knex from './config/database';
 import e from 'express';
+import { Console } from 'console';
+import { date } from 'joi';
 
 const DAY_TO_MILIS = 86400000
 const MINUTES_TO_MILIS = 60000
@@ -55,14 +57,14 @@ export function getDocors() {
 }
 
 export async function generateSlotsFromAppointment(appointment) {
-    console.log('generateSlotsFromAppointment')
     const duration = appointment.duration;
     const fromDate = appointment.date;
+    console.log(fromDate)
     let iter = fromDate.getTime();
     const doctors = await getDocors();
     const d = doctors.doctors.find(element => element.id === appointment.doctorKey);
     const appointments = []
-    while (iter < fromDate.getTime() + duration) {
+    while (iter < fromDate.getTime() + duration * MINUTES_TO_MILIS) {
         appointments.push(d.uslugiLekarzy.map((service) => {
             return {
                 date: iter,
@@ -77,8 +79,8 @@ export async function generateSlotsFromAppointment(appointment) {
             };
         }))
         iter = iter + MINUTES_TO_MILIS*15;
-    }
-    return appointments;
+    }1
+    return flatten(appointments);
 }
 
 export async function getSlots(fromDate, toDate) {
