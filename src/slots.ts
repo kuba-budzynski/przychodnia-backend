@@ -63,7 +63,7 @@ export function getDocors() {
 export async function generateSlotsFromAppointment(appointment) {
     const duration = appointment.duration;
     const fromDate = new Date(appointment.date);
-    fromDate.setHours(fromDate.getHours() + 2)
+    fromDate.setHours(fromDate.getHours())
     let iter = fromDate.getTime();
     const doctors = await getDocors();
     const d = doctors.doctors.find(element => element.id === appointment.doctorKey);
